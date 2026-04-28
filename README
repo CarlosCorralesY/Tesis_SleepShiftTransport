@@ -1,0 +1,28 @@
+# Sistema de Detección de Fatiga (OpenCV puro)
+
+Este programa detecta en tiempo real, usando solo la cámara web, el nivel de somnolencia de una persona midiendo parpadeos y calculando el porcentaje de tiempo con ojos cerrados (PERCLOS). No requiere MediaPipe ni Dlib; funciona exclusivamente con OpenCV y sus clasificadores Haar.
+
+## Caracteristicas
+
+- Detección de rostro y ojos mediante clasificadores Haar de OpenCV.
+- Cálculo de la abertura real del ojo mediante análisis del área de la pupila (umbral adaptativo + contornos).
+- Conteo de parpadeos (blinks) con filtro de frames consecutivos.
+- Cálculo de PERCLOS en ventana deslizante de 30 segundos.
+- Métricas en pantalla: abertura promedio, número de parpadeos, PERCLOS y FPS.
+- Alerta visual cuando PERCLOS supera el 30%.
+- Impresión en consola de cada parpadeo detectado y resumen final.
+
+## Requisitos
+
+- Python 3.7 o superior.
+- OpenCV (contrib) instalado.
+- Numpy.
+- Webcam funcional.
+
+## Instalacion
+
+1. Clonar el repositorio o descargar el script.
+2. Instalar las dependencias:
+
+```bash
+pip install opencv-python numpy
