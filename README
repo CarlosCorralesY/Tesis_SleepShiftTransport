@@ -1,4 +1,4 @@
-# Sistema de Detección de Fatiga (OpenCV puro)
+# Sistema de Detección de Fatiga
 
 Este programa detecta en tiempo real, usando solo la cámara web, el nivel de somnolencia de una persona midiendo parpadeos y calculando el porcentaje de tiempo con ojos cerrados (PERCLOS).Funciona exclusivamente con OpenCV y sus clasificadores.
 
