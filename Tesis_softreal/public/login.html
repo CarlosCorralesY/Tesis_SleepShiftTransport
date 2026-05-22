@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SleepShift Transport - Iniciar Sesión</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Fuente de iconos de Google -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!-- Fuente Inter de Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-bg">
+        <!-- Patrón de fondo sutil con iconos de transporte -->
+        <div class="bg-pattern"></div>
+        
+        <div class="login-container">
+            <div class="login-card">
+                <!-- Encabezado -->
+                <div class="login-header">
+                    <div class="logo-icon">
+                        <span class="material-symbols-rounded">directions_bus</span>
+                    </div>
+                    <h1>SleepShift Transport</h1>
+                    <p class="subtitle">Sistema de Asignación de Viajes</p>
+                </div>
+
+                <!-- Formulario -->
+                <form id="loginForm" class="login-form">
+                    <!-- Selector de Rol -->
+                    <div class="role-selector">
+                        <label class="role-option">
+                            <input type="radio" name="role" value="coordinador" checked>
+                            <span class="role-card">
+                                <span class="material-symbols-rounded">admin_panel_settings</span>
+                                <span class="role-label">Coordinador</span>
+                            </span>
+                        </label>
+                        <label class="role-option">
+                            <input type="radio" name="role" value="conductor">
+                            <span class="role-card">
+                                <!-- Icono de conductor: automóvil -->
+                                <span class="material-symbols-rounded">directions_car</span>
+                                <span class="role-label">Conductor</span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Campo Usuario -->
+                    <div class="input-group">
+                        <span class="material-symbols-rounded input-icon">person</span>
+                        <input type="text" id="username" name="username" placeholder="Usuario" required autocomplete="off">
+                    </div>
+
+                    <!-- Campo Contraseña -->
+                    <div class="input-group">
+                        <span class="material-symbols-rounded input-icon">lock</span>
+                        <input type="password" id="password" name="password" placeholder="Contraseña" required>
+                        <button type="button" id="togglePassword" class="toggle-password" tabindex="-1">
+                            <span class="material-symbols-rounded">visibility_off</span>
+                        </button>
+                    </div>
+
+                    <!-- Mensaje de error -->
+                    <div id="errorMessage" class="error-message hidden">
+                        <span class="material-symbols-rounded">error</span>
+                        <span id="errorText"></span>
+                    </div>
+
+                    <!-- Botón -->
+                    <button type="submit" id="loginButton" class="btn-login">
+                        <span class="btn-text">Iniciar Sesión</span>
+                        <span class="btn-loader hidden">
+                            <span class="spinner"></span>
+                        </span>
+                    </button>
+                </form>
+
+                <!-- Footer -->
+                <div class="login-footer">
+                    <p>© 2026 SleepShift Transport · v1.0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+</html>

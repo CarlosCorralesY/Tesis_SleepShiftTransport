@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SleepShift Transport - Panel Conductor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+    <!-- Librería de MediaPipe FaceMesh -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+
+    <style>
+        /* ===== SIDEBAR STYLES ===== */
+        .dashboard-layout {
+            display: flex;
+            min-height: calc(100vh - 64px);
+        }
+        .sidebar {
+            width: 240px;
+            background: var(--white);
+            border-right: 1px solid var(--gray-200);
+            padding: 24px 0;
+            flex-shrink: 0;
+        }
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-menu li {
+            margin-bottom: 4px;
+        }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all var(--transition);
+            border-left: 3px solid transparent;
+        }
+        .sidebar-menu a:hover {
+            background: var(--gray-50);
+            color: var(--primary);
+        }
+        .sidebar-menu a.active {
+            background: rgba(26, 54, 93, 0.05);
+            color: var(--primary);
+            font-weight: 600;
+            border-left-color: var(--primary);
+        }
+        .sidebar-menu .material-symbols-rounded {
+            font-size: 22px;
+        }
+        .main-content {
+            flex: 1;
+            padding: 32px;
+            background: var(--gray-50);
+        }
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        /* ===== MODAL STYLES ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-xl);
+            animation: modalPop 0.3s ease-out;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+        }
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .modal-message {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 24px;
+        }
+        .modal-score {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 24px;
+        }
+        .modal-btn {
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+            transition: background var(--transition);
+        }
+        .modal-btn:hover {
+            background: var(--primary-light);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 200px; }
+            .main-content { padding: 20px; }
+        }
+    </style>
+</head>
+<body class="dashboard">
+    <!-- Barra superior -->
+    <header class="topbar">
+        <div class="topbar-brand">
+            <span class="material-symbols-rounded">directions_bus</span>
+            <span>SleepShift Transport</span>
+        </div>
+        <div class="topbar-user">
+            <span id="userName">Conductor</span>
+            <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <!-- Layout con sidebar + contenido -->
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="#" data-tab="dashboard" class="active">
+                        <span class="material-symbols-rounded">dashboard</span>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-tab="viajes">
+                        <span class="material-symbols-rounded">route</span>
+                        Mis Viajes
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-tab="somnolencia">
+                        <span class="material-symbols-rounded">monitoring</span>
+                        Nivel de Somnolencia
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <!-- Mensaje global -->
+            <div id="mensaje" class="hidden"></div>
+
+            <!-- ========== PANEL: DASHBOARD ========== -->
+            <section id="tab-dashboard" class="tab-panel active">
+                <h2 class="page-title">Resumen del Día</h2>
+                <p class="page-subtitle">Tu estado actual y próximos viajes.</p>
+
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-value" id="viajesHoy">0</div>
+                        <div class="stat-label">Viajes Hoy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="puntuacionActual">--</div>
+                        <div class="stat-label">Puntuación Somnolencia</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="proximoViaje">--</div>
+                        <div class="stat-label">Próximo Viaje</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Mis Últimos Viajes</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Origen</th>
+                                    <th>Destino</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ultimosViajesBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== PANEL: MIS VIAJES ========== -->
+            <section id="tab-viajes" class="tab-panel">
+                <h2 class="page-title">Mis Viajes</h2>
+                <p class="page-subtitle">Acepta viajes pendientes y consulta tus asignaciones.</p>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Viajes Pendientes de Aceptar</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Origen</th>
+                                    <th>Destino</th>
+                                    <th>Fecha</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viajesPendientesBody"></tbody>
+                        </table>
+                        <div id="sinViajesPendientes" class="hidden" style="padding: 20px; text-align: center; color: var(--gray-400);">
+                            No hay viajes pendientes.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Viajes Asignados a Mí</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Origen</th>
+                                    <th>Destino</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viajesAsignadosBody"></tbody>
+                        </table>
+                        <div id="sinViajesAsignados" class="hidden" style="padding: 20px; text-align: center; color: var(--gray-400);">
+                            No tienes viajes asignados todavía.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========== PANEL: NIVEL DE SOMNOLENCIA ========== -->
+            <section id="tab-somnolencia" class="tab-panel">
+                <h2 class="page-title">Test de Somnolencia</h2>
+                <p class="page-subtitle">Evaluación en tiempo real con PERCLOS, EAR, MAR, parpadeos y bostezos. La prueba dura 45 segundos.</p>
+
+                <div class="card" style="padding: 20px;">
+                    <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+                        <!-- Columna izquierda: cámara -->
+                        <div style="flex: 1; min-width: 300px; position: relative;">
+                            <div id="camaraContainer" style="position: relative; display: inline-block; width: 100%;">
+                                <video id="video" width="640" height="480" autoplay muted playsinline
+                                       style="width: 100%; height: auto; border-radius: var(--radius-sm); border: 1px solid var(--gray-300);"></video>
+                                <canvas id="canvas" width="640" height="480"
+                                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: var(--radius-sm);"></canvas>
+                                <div id="alertOverlay" style="display:none; position:absolute; top:0; left:0;
+                                     width:100%; height:100%; background:rgba(255,0,0,0.3); border-radius: var(--radius-sm);"></div>
+                            </div>
+                            <div id="timerDisplay" style="margin-top: 8px; font-size: 14px; color: var(--gray-600); text-align: center;">
+                                Tiempo restante: <strong id="segundosRestantes">45</strong> s
+                            </div>
+                            <div style="margin-top: 12px; text-align: center;">
+                                <button id="btnIniciarPrueba" class="btn btn-primary" style="padding: 12px 24px;">
+                                    <span class="material-symbols-rounded" style="vertical-align: middle; margin-right: 8px;">videocam</span>
+                                    Iniciar Prueba
+                                </button>
+                                <button id="btnDetenerPrueba" class="btn btn-logout" style="margin-left: 8px;">
+                                    Detener
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Columna derecha: métricas en vivo -->
+                        <div style="width: 260px; min-width: 200px; background: var(--gray-50); border-radius: var(--radius-sm); padding: 16px; border: 1px solid var(--gray-200);">
+                            <h4 style="margin-bottom: 12px; font-size: 16px; color: var(--primary);">📊 Datos en Vivo</h4>
+                            <div style="margin-bottom: 16px;">
+                                <div style="font-size: 13px; color: var(--gray-500);">Puntuación</div>
+                                <div style="font-size: 28px; font-weight: 700; color: var(--primary);" id="puntajeSomnolencia">--</div>
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <div style="font-size: 13px; color: var(--gray-500);">PERCLOS (%)</div>
+                                <div style="font-size: 20px; font-weight: 600;" id="perclosValue">--</div>
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <div style="font-size: 13px; color: var(--gray-500);">EAR (apertura de ojos)</div>
+                                <div style="font-size: 20px; font-weight: 600;" id="earValue">--</div>
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <div style="font-size: 13px; color: var(--gray-500);">MAR (boca)</div>
+                                <div style="font-size: 20px; font-weight: 600;" id="marValue">--</div>
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <div style="font-size: 13px; color: var(--gray-500);">👁️ Parpadeos</div>
+                                <div style="font-size: 20px; font-weight: 600;" id="parpadeosValue">0</div>
+                                <div style="font-size: 11px; color: var(--gray-400);" id="parpadeosPorMin">0 por minuto</div>
+                            </div>
+                            <div style="margin-bottom: 16px;">
+                                <div style="font-size: 13px; color: var(--gray-500);">😮 Bostezos</div>
+                                <div style="font-size: 20px; font-weight: 600;" id="bostezosValue">0</div>
+                            </div>
+                            <div id="estadoAlerta" style="font-size: 14px; font-weight: 500;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ========== MODAL DE RESULTADO ========== -->
+    <div id="modalResultado" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-icon" id="modalIcon"></div>
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-score" id="modalScore"></div>
+            <div class="modal-message" id="modalMessage"></div>
+            <button class="modal-btn" id="modalCloseBtn">Aceptar</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/conductor.js"></script>
+    <script src="js/drowsiness.js"></script>
+</body>
+</html>

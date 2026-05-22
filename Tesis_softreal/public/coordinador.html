@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SleepShift Transport - Panel Coordinador</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard">
+    <!-- Barra superior -->
+    <header class="topbar">
+        <div class="topbar-brand">
+            <span class="material-symbols-rounded">directions_bus</span>
+            <span>SleepShift Transport</span>
+        </div>
+        <div class="topbar-user">
+            <span id="userName">Coordinador</span>
+            <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="dashboard-content">
+        <h2 class="page-title">Panel de Coordinador</h2>
+        <p class="page-subtitle">Gestiona los viajes y asigna conductores según su estado de alerta.</p>
+
+        <!-- Estadísticas -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" id="totalViajes">0</div>
+                <div class="stat-label">Total Viajes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="viajesPendientes">0</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="viajesAsignados">0</div>
+                <div class="stat-label">Asignados</div>
+            </div>
+        </div>
+
+        <!-- Formulario para crear nuevo viaje -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Nuevo Viaje</h3>
+            </div>
+            <form id="formCrearViaje">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="origen">Origen</label>
+                        <input type="text" id="origen" placeholder="Ej. Terminal Central" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="destino">Destino</label>
+                        <input type="text" id="destino" placeholder="Ej. Aeropuerto" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fecha">Fecha y hora de salida</label>
+                        <input type="datetime-local" id="fecha" required>
+                    </div>
+                    <div class="form-group" style="align-self: flex-end;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Crear Viaje</button>
+                    </div>
+                </div>
+            </form>
+            <div id="mensaje" class="hidden"></div>
+        </div>
+
+        <!-- Tabla de viajes -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Todos los Viajes</h3>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Origen</th>
+                            <th>Destino</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Conductor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="viajesTableBody">
+                        <!-- Se llena dinámicamente con js/coordinador.js -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/coordinador.js"></script>
+</body>
+</html>
